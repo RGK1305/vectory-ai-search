@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  # -----------------------------
+  # SERVICE 1: The AI Embedder (Python)
+  # -----------------------------
+  embedder:
+    build: 
+      context: ./vector-embedding-service
+      dockerfile: Dockerfile
+    container_name: vectory-embedder
+    ports:
+      - "8000:8000"  # Expose Python API on port 8000
+    networks:
+      - vectory-net
+    restart: always
+
+  # -----------------------------
+  # SERVICE 2: The Core Engine (Java)
+  # -----------------------------
+  core:
+    build: 
+      context: ./vector-core-service
+      dockerfile: Dockerfile
+    container_name: vectory-core
+    ports:
+      - "8080:8080"  # Expose Java Search Engine on port 8080
+    environment:
+      # This tells Java where to find the Python service inside Docker
+      - EMBEDDING_SERVICE_URL=http://embedder:8000/embed
+    networks:
+      - vectory-net
+    depends_on:
+      - embedder     # Wait for Python service to start before starting Java
+# -----------------------------
+  # SERVICE 3: The Frontend (Streamlit)
+  # -----------------------------
+  frontend:
+    build: ./vector-frontend
+    container_name: vectory-frontend
+    ports:
+      - "8501:8501"  # Expose UI on port 8501
+    depends_on:
+      - core         # Wait for Java to start
+    networks:
+      - vectory-net
+networks:
+  vectory-net:
+    driver: bridge
