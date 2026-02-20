@@ -101,6 +101,6 @@ Async Processing: Implement RabbitMQ or Kafka to handle vectorization jobs async
 
 Scaling: Deploy to Kubernetes (K8s) with auto-scaling for the Python AI service.
 
-Author: Goutham Ravulapally
+Author: Ravulapally Goutham
 
 Built for the 2026 AI Architecture Showcase
